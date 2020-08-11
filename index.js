@@ -170,3 +170,31 @@ app.listen(3000, () => {
 });
 
 
+// esecuzione
+
+var files =
+
+[
+  {
+    fieldname: 'documento2',
+    originalname: 'Bando_di_concorso_ISTRUTTORE_DIR_INFORMATICO_per_firma.pdf',
+    encoding: '7bit',
+    mimetype: 'application/pdf',
+    destination: 'uploads/',
+    filename: '31784cb39200913dd819fa93e19fa260',
+    path: 'uploads/31784cb39200913dd819fa93e19fa260',
+    size: 361323
+  }
+];
+
+const cM = require('./customValidator');
+
+files.forEach((item) => {
+
+  item.hash = cM.buildHash(item.path);
+  item.file_size = cM.getFileSize(item.path);
+  
+
+});
+
+console.log(files);
