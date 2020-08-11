@@ -188,13 +188,15 @@ var files =
 ];
 
 const cM = require('./customValidator');
+const fD = require('./fakeData');
+console.log(fD.getF());
 
-files.forEach((item) => {
-
+var fl = fD.getF();
+fl.forEach((item) => {
   item.hash = cM.buildHash(item.path);
   item.file_size = cM.getFileSize(item.path);
-  
-
 });
 
-console.log(files);
+console.log(fl);
+
+console.log('Inviare ai controlli');
