@@ -90,6 +90,7 @@ app.post( "/upload/:formName",
   // console.log('--singolo--');
   // console.log(req.file, req.body);
 
+  console.log('###################################');
   console.log('--headers--');
   console.log(req.headers);
   console.log('--params--');
@@ -107,7 +108,7 @@ app.post( "/upload/:formName",
   
   // Controlla che il formName sia valido ed esista
   if (cV.formNameIsValidAndExists(req.params.formName)) {
-    console.log('** formName valid loading data');
+    console.log('formName valid loading data');
     configForm = fD.getF();
   } else {
     console.log('no formName');
@@ -120,7 +121,7 @@ app.post( "/upload/:formName",
   // verifica esistenza token e sua validità temporale
 
   var sC = cV.getSecurityContextExistsIfValid(uploadData);
-  if(Object.keys(sC).length <> 0) {
+  if(Object.keys(sC).length != 0) {
     console.log('security context:');
     console.log(sC);
   } else {
@@ -128,6 +129,9 @@ app.post( "/upload/:formName",
     res.send({"status" : "error", "msg": "no security context"});
     return;
   }
+
+  // remove securityContext from data
+  delete uploadData.securityContext;
 
   // controlla gli hash dei files e dei dati 
   if (cV.checkDataIntegrity(uploadData, uploadFiles, configForm, sC)) {

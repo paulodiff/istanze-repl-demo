@@ -41,17 +41,20 @@ module.exports = {
 
     if(u.securityContext) {
       sC = JSON.parse(u.securityContext);
+      console.log(sC);
     }
 
     // controlla che esistano le proprietà in sC
     var rV = sC && ("rrtoken" in sC) && ("rrhash" in sC);
 
     if(rV) {
-      return rV;
+      console.log('securityContext ok return data');
+      return sC;
     } else {
+      console.log('securityContext erro return null');
       return null;
     }
-    return rV;
+   
   },
 
   formNameIsValidAndExists: function(fN) {
@@ -66,6 +69,7 @@ module.exports = {
 
   checkDataIntegrity: function(uD,uF,cF,sC) {
 
+    console.log('--checkDataIntegrity--');
     //per ogni file viene calcolato l'hash e controllato
     uF.forEach((item) => {
 
@@ -95,42 +99,32 @@ module.exports = {
     var hash = sha256.hmac.create(sC.rrtoken);
     Object.keys(uD).forEach((key, index) => {
  
-      if ( uD[key] instanceof File ) {
-        console.log('hash add', key, uD[key].file_hash);
-        hash.update(uD[key].file_hash);
-      } 
-
-      if (typeof uD[key] === 'string') {
-        console.log('hash add', key, uD[key]);
-        hash.update(uD[key]);
-      }
-              
-       if (typeof currentModel[key] === 'boolean') {
-        console.log('hash add', key, uD[key]);
-        hash.update(uD[key].toString());
-      }
-
+      
+      console.log('hash add', key, uD[key]);
+      hash.update(uD[key]);
+      
     });
 
     var cH = hash.hex();
     if(cH === sC.rrhash) {
-      console.log('hash corretto!');
+      console.log('hash corretto!', cH, sC.rrhash);
     } else {
       console.log('hash errato:', cH, sC.rrhash);
       return false;
     }
-
-    
+  
 
     return true;
 
   },
 
   checkSvgCapthca(u) {
+    console.log('--checkSvgCapthca--');
     return true;
   },
 
   checkDataTypeAndValue(a,b,c,d) {
+    console.log('--checkDataTypeAndValue--');
     return true;
   }
 
