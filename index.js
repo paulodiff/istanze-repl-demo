@@ -2,9 +2,10 @@ const express = require('express');
 const path = require("path")
 const multer = require("multer");
 var upload = multer({ dest: 'uploads/' });
-
 const app = express();
 
+const cV = require('./customValidator');
+const fD = require('./fakeData');
 
 app.use(function(req, res, next){
   res.header("Access-Control-Allow-Origin", "*");
@@ -82,29 +83,83 @@ app.get("/info", function(req, res, next) {
   res.send({"status" : "success", "msg": "Success, data recieved!"});
 });
 
-app.post("/upload", upload.any(), function(req, res, next) {
+app.post( "/upload/:formName", 
+          upload.any(), 
+          function(req, res, next) {
 
   // console.log('--singolo--');
   // console.log(req.file, req.body);
+
   console.log('--headers--');
   console.log(req.headers);
+  console.log('--params--');
+  console.log(req.params);
   console.log('--body--');
   console.log(req.body);
   console.log('--files--');
   console.log(req.files);
-  res.send({"status" : "success", "msg": "Success, data uploaded!"});
+
+  var uploadData = req.body;
+  var uploadFiles = req.files;
+  var configForm = {};
+  var configOptions = {};
+
+  
+  // Controlla che il formName sia valido ed esista
+  if (cV.formNameIsValidAndExists(req.params.formName)) {
+    console.log('** formName valid loading data');
+    configForm = fD.getF();
+  } else {
+    console.log('no formName');
+    res.status(500).send({"status" : "error", "msg": "no form Name"});
+  }
 
   // Verifica 1 controllo esistenza dei seguenti campi
   // rr-token : token di autorizzazione
   // rr-hash  : calcolo hash del form
+  // verifica esistenza token e sua validità temporale
 
-  // VERIFICA esistenza token se la richiesta è permessa
+  var sC = cV.getSecurityContextExistsIfValid(uploadData);
+  if(Object.keys(sC).length <> 0) {
+    console.log('security context:');
+    console.log(sC);
+  } else {
+    console.log('no security context');
+    res.send({"status" : "error", "msg": "no security context"});
+    return;
+  }
+
+  // controlla gli hash dei files e dei dati 
+  if (cV.checkDataIntegrity(uploadData, uploadFiles, configForm, sC)) {
+    console.log('integrity ok!');
+  } else {
+    console.log('integrity error');
+  }
+
+  // verifica valore svgCaptha 
+  if (cV.checkSvgCapthca(uploadData)) {
+    console.log('checkSvgCapthca ok');
+  } else {
+    console.log('checkSvgCapthca error');
+  }
+
+  // verifica tipo e valore dei dati/files passati con i vari customValidator e configurazione
+  if (cV.checkDataTypeAndValue(uploadData, uploadFiles, configForm, configOptions)) {
+       console.log('checkDataTypeAndValue ok');
+  } else {
+        console.log('checkDataTypeAndValue error');  
+  }
+
+  //FINALMENTE IL DATO PUO' ESSERE PROCESSATO 
 
   // VERIFICHE integrità della richiesta
   // se vi sono files allora calcolo hash e controllo
   // calcolo hash dei dati e Verifica
+  // if (cV.checkRequestIntegrity(uploadData, uploadFiles, ))
   
-  // VERIFICA esistenza
+  // VERIFICA svgCaptha
+
+   res.send({"status" : "success", "msg": "Success, data uploaded!"});
 
 });
 
@@ -200,14 +255,13 @@ var files =
   }
 ];
 
-const cM = require('./customValidator');
-const fD = require('./fakeData');
+
 console.log(fD.getF());
 
 var fl = fD.getF();
 fl.forEach((item) => {
-  item.hash = cM.buildHash(item.path);
-  item.file_size = cM.getFileSize(item.path);
+  item.hash = cV.buildHash(item.path);
+  item.file_size = cV.getFileSize(item.path);
 });
 
 console.log(fl);
