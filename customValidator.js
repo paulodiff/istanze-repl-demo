@@ -9,6 +9,8 @@
 var fs = require('fs');
 var sha256 = require('js-sha256');
 const path = require('path');
+const moment = require('moment');
+var momentTZ = require('moment-timezone');
 
 module.exports = {
 
@@ -135,26 +137,62 @@ module.exports = {
   checkDataTypeAndValue: function(a,b,c,d) {
     console.log('--checkDataTypeAndValue--');
     return true;
-  }
+  },
 
 
   // ritorna il contesto di sicurezza locale
   // sC securityContext
   // eC environent configuration
   getLocalSecurityContext: function(sC, eC) {
+
     console.log('---getLocalSecurityContext---');
     var lsC = {};
-    var fName = path.join([eC.configPath , sC.rrtoken]);
+    var fName = path.join(eC.configLocalSecurityPath, sC.rrtoken);
     console.log(fName);
     try {
       if (fs.existsSync(fName)) {
-    //file exists
-    }
+        let rawdata = fs.readFileSync(fName);
+        lsC = JSON.parse(rawdata);
+        console.log(lsC);
+
+        // controllo del timestamp se è scaduto
+        // current time stamp
+        var cTS = momentTZ().tz("Europe/Rome");
+        console.log('cTS:', cTS);
+
+        var sTS = momentTZ.tz(lsC.ts, "Europe/Rome");
+        console.log('sTS:', sTS);
+
+        sTS.add(eC.tokenTimeoutInMinutes, 'minutes');
+        console.log('sTS:', sTS);
+        // security context creation time stamp
+        
+
+        console.log('isAfter?:', cTS.isAfter(sTS));
+
+        if( cTS.isAfter(sTS)) {
+          console.log('token expired!');
+          return {};
+        } else {
+          return lsC;
+        }
+
+
+        // moment().add(7, 'days').add(1, 'months');
+        // moment('2010-10-20').isAfter('2010-10-19'); // true
+
+
+        
+      } else {
+        console.log('local security context not found!');
+        return lsC;
+      }
     } catch(err) {
-        console.error(err)
+        console.error(err);
+        return lsC;
     }
 
-    return lsC;
+    
   }
 
 }

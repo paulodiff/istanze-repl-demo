@@ -3,6 +3,8 @@ const path = require("path")
 const multer = require("multer");
 var upload = multer({ dest: 'uploads/' });
 const app = express();
+const moment = require('moment');
+var momentTZ = require('moment-timezone');
 
 const cV = require('./customValidator');
 const fD = require('./fakeData');
@@ -145,7 +147,7 @@ app.post( "/upload/:formName",
 
   // get local_securityContext
   // recupera se esiste il local security context
-  var lsC = cV.getLocalSecurityContext(sC);
+  var lsC = cV.getLocalSecurityContext(sC, environmentConfig);
    if(Object.keys(lsC).length != 0) {
     console.log('local security context:');
     console.log(lsC);
@@ -157,7 +159,7 @@ app.post( "/upload/:formName",
 
 
   // verifica valore svgCaptha 
-  if (cV.checkSvgCapthca(uploadData)) {
+  if (cV.checkSvgCapthca(uploadData, lsC)) {
     console.log('checkSvgCapthca ok');
   } else {
     console.log('checkSvgCapthca error');
@@ -231,7 +233,7 @@ var files =
   }
 ];
 
-
+/*
 console.log(fD.getF());
 
 var fl = fD.getF();
@@ -241,5 +243,9 @@ fl.forEach((item) => {
 });
 
 console.log(fl);
+*/
 
 console.log('Inviare ai controlli');
+console.log(moment().toISOString());
+console.log(moment().unix());
+console.log(momentTZ().tz("Europe/Rome").format());

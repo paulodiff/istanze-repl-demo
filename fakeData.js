@@ -130,7 +130,8 @@ var _form = [
 var _options = {};
 
 var _env = {
-  "configPath" : "config";
+  "configLocalSecurityPath" : "security",
+  "tokenTimeoutInMinutes" : "10"
 };
 
 module.exports = {
