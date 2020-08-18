@@ -8,6 +8,7 @@
 // const shajs = require('sha.js');
 var fs = require('fs');
 var sha256 = require('js-sha256');
+const path = require('path');
 
 module.exports = {
 
@@ -57,6 +58,7 @@ module.exports = {
    
   },
 
+  // verifica che il form name esista e ci sia la configurazione per il form (tutto in una cartella)
   formNameIsValidAndExists: function(fN) {
     return true;
   },
@@ -118,14 +120,41 @@ module.exports = {
 
   },
 
-  checkSvgCapthca(u) {
+  checkSvgCapthca: function(uD, sC) {
     console.log('--checkSvgCapthca--');
+
+    // controlla se esiste la risposta
+
+    // dal securityContext recupera i dati
+
+    // verifica la risposta 
+
     return true;
   },
 
-  checkDataTypeAndValue(a,b,c,d) {
+  checkDataTypeAndValue: function(a,b,c,d) {
     console.log('--checkDataTypeAndValue--');
     return true;
+  }
+
+
+  // ritorna il contesto di sicurezza locale
+  // sC securityContext
+  // eC environent configuration
+  getLocalSecurityContext: function(sC, eC) {
+    console.log('---getLocalSecurityContext---');
+    var lsC = {};
+    var fName = path.join([eC.configPath , sC.rrtoken]);
+    console.log(fName);
+    try {
+      if (fs.existsSync(fName)) {
+    //file exists
+    }
+    } catch(err) {
+        console.error(err)
+    }
+
+    return lsC;
   }
 
 }

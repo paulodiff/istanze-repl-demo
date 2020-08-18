@@ -127,6 +127,12 @@ var _form = [
 
 ]; 
 
+var _options = {};
+
+var _env = {
+  "configPath" : "config";
+};
+
 module.exports = {
 
 
@@ -137,7 +143,16 @@ module.exports = {
 
   getB : function() {
     return _body;
+  },
+
+  getO : function() {
+    return _options;
+  },
+
+  getEnv : function() {
+    return _env;
   }
+
 
 
 }

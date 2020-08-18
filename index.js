@@ -100,6 +100,7 @@ app.post( "/upload/:formName",
   console.log('--files--');
   console.log(req.files);
 
+  var environmentConfig = fD.getEnv();
   var uploadData = req.body;
   var uploadFiles = req.files;
   var configForm = {};
@@ -109,7 +110,9 @@ app.post( "/upload/:formName",
   // Controlla che il formName sia valido ed esista
   if (cV.formNameIsValidAndExists(req.params.formName)) {
     console.log('formName valid loading data');
+    // fake loading data
     configForm = fD.getF();
+    configOptions = fD.getO();
   } else {
     console.log('no formName');
     res.status(500).send({"status" : "error", "msg": "no form Name"});
@@ -140,18 +143,35 @@ app.post( "/upload/:formName",
     console.log('integrity error');
   }
 
+  // get local_securityContext
+  // recupera se esiste il local security context
+  var lsC = cV.getLocalSecurityContext(sC);
+   if(Object.keys(lsC).length != 0) {
+    console.log('local security context:');
+    console.log(lsC);
+  } else {
+    console.log('no local security context');
+    res.send({"status" : "error", "msg": "no security context"});
+    return;
+  }
+
+
   // verifica valore svgCaptha 
   if (cV.checkSvgCapthca(uploadData)) {
     console.log('checkSvgCapthca ok');
   } else {
     console.log('checkSvgCapthca error');
+    res.send({"status" : "error", "msg": "no checkSvgCapthca error"});
+    return;
   }
 
   // verifica tipo e valore dei dati/files passati con i vari customValidator e configurazione
   if (cV.checkDataTypeAndValue(uploadData, uploadFiles, configForm, configOptions)) {
        console.log('checkDataTypeAndValue ok');
   } else {
-        console.log('checkDataTypeAndValue error');  
+        console.log('checkDataTypeAndValue error');
+    res.send({"status" : "error", "msg": "no checkDataTypeAndValue error"});
+    return;
   }
 
   //FINALMENTE IL DATO PUO' ESSERE PROCESSATO 
@@ -187,54 +207,6 @@ var storage = multer.diskStorage({
 // picture i.e. 1 MB. it is optional 
 const maxSize = 1 * 1000 * 1000;
 
-/*
-var upload = multer({  
-    storage: storage, 
-    limits: { fileSize: maxSize }, 
-    fileFilter: function (req, file, cb){ 
-    
-        // Set the filetypes, it is optional 
-        var filetypes = /jpeg|jpg|png/; 
-        var mimetype = filetypes.test(file.mimetype); 
-  
-        var extname = filetypes.test(path.extname( 
-                    file.originalname).toLowerCase()); 
-        
-        if (mimetype && extname) { 
-            return cb(null, true); 
-        } 
-      
-        cb("Error: File upload only supports the "
-                + "following filetypes - " + filetypes); 
-      }  
-  
-// mypic is the name of file attribute 
-}).single("mypic");     
-*/
-
-/*
-    
-app.post("/upload11",function (req, res, next) { 
-        
-    // Error MiddleWare for multer file upload, so if any 
-    // error occurs, the image would not be uploaded! 
-    upload(req,res,function(err) { 
-  
-        if(err) { 
-  
-            // ERROR occured (here it can be occured due 
-            // to uploading image of size greater than 
-            // 1MB or uploading different file type) 
-            res.send(err) 
-        } 
-        else { 
-  
-            // SUCCESS, image successfully uploaded 
-            res.send("Success, Image uploaded!") 
-        } 
-    }) 
-});
-*/
 
 
 app.listen(3000, () => {
