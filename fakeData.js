@@ -31,6 +31,102 @@ var _files =
   }
 ];
 
+var _form = [
+  {
+    "key": "info1",
+    "type": "html-template",
+    "templateOptions": {
+      "htmlTemplate" :"<h3>Test html template</h3>",
+      "label": "html template label"
+      }
+  },
+  
+
+
+   {
+      "key": "documento1",
+      "type": "upload-italia",
+      "templateOptions": {
+        "required" : true,
+        "label": "file1 pdf,doc,txt,svg  documento di identità in formato PDF con dimensione massima 1 MB",
+        "maxFileSize" : "1024kb",
+        "minFileSize" : "10kb",
+        "fileExtension" : "pdf,doc,txt,svg"
+      }
+
+      ,
+      "validators": {
+        "validation": ["fileValidator"]
+      }
+    },
+
+
+     {
+      "key": "documento2",
+      "type": "upload-italia",
+      "templateOptions": {
+        "required" : true,
+        "label": "file2- documento di identità in formato PDF con dimensione massima 1 MB",
+        "maxFileSize" : "1024kb",
+        "minFileSize" : "10kb",
+        "fileExtension" : "pdf,doc,t"
+      }
+
+      ,
+      "validators": {
+        "validation": ["fileValidator"]
+      }
+    },
+
+{
+    "key": "info2",
+    "type": "html-template",
+    "templateOptions": {
+      "htmlTemplate" :"<h3>Info 3</h3>",
+      "label": "html template label"
+      }
+  },
+
+     {
+      "key": "capRimini",
+      "type": "input",
+      "templateOptions": {
+        "label": "cap 1 rimini",
+        "required" : true
+      },
+       "validators": {
+        "validation": ["capValidator"]
+      }
+    },
+
+    {
+      "key": "noTrailingSpaces",
+      "type": "input",
+      "templateOptions": {
+        "label": "no trailing or ending space AAND default control"
+      }
+      ,
+      "validators": {
+        "validation": [
+          "avoidStartingAndEndnigSpaceValidator",
+          "defaultUserInputValidator"
+          ]
+      }
+    },
+
+    {
+      "key": "svgCaptcha",
+      "type": "svgcaptcha",
+      "templateOptions": {
+        "label": "Controllo di sicurezza",
+        "description" : "ATTENZIONE visualizzare l'immagine, leggere con attenzione la domanda e rispondere digitando i numeri richiesti",
+        "required" : true
+     
+      }
+    }
+
+]; 
+
 module.exports = {
 
 

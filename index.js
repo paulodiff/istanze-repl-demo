@@ -93,6 +93,19 @@ app.post("/upload", upload.any(), function(req, res, next) {
   console.log('--files--');
   console.log(req.files);
   res.send({"status" : "success", "msg": "Success, data uploaded!"});
+
+  // Verifica 1 controllo esistenza dei seguenti campi
+  // rr-token : token di autorizzazione
+  // rr-hash  : calcolo hash del form
+
+  // VERIFICA esistenza token se la richiesta è permessa
+
+  // VERIFICHE integrità della richiesta
+  // se vi sono files allora calcolo hash e controllo
+  // calcolo hash dei dati e Verifica
+  
+  // VERIFICA esistenza
+
 });
 
 

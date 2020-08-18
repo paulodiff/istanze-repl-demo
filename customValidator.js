@@ -25,7 +25,7 @@ module.exports = {
   },
 
 
- buildHash: function(file) {
+  buildHash: function(file) {
     console.log('buildHash', file);
     var data = fs.readFileSync(file);
     var encrypted = sha256(data);
