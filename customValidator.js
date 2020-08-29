@@ -11,6 +11,9 @@ var sha256 = require('js-sha256');
 const path = require('path');
 const moment = require('moment');
 var momentTZ = require('moment-timezone');
+var jwt = require('jsonwebtoken');
+var crypto = require('crypto');
+var base64url = require('base64url');
 
 module.exports = {
 
@@ -195,6 +198,70 @@ module.exports = {
     }
 
     
-  }
+  },
+
+   // Encrypt with AES 64
+  encryptStringWithAES_64: function(toEncrypt, iv) {
+
+    let cipher_algorithm = 'AES-256-CBC';
+    // logger.logVerbose('[#AES#e]','toEncrypt=', toEncrypt); // 098F6BCD4621D373CADE4E832627B4F6
+
+    // get password's md5 hash
+    let password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
+    // logger.logVerbose('[#AES#e]','password=', password); // 098F6BCD4621D373CADE4E832627B4F6
+
+    // our data to encrypt
+    // let data = '06401;0001001;04;15650.05;03';
+    let data = toEncrypt;
+    // logger.logVerbose('[#AES#e]','data=', data);
+    // logger.logVerbose('[#AES#e]','iv=', iv);
+
+    // encrypt data
+    var cipher = crypto.createCipheriv(cipher_algorithm, password, iv);
+    var encryptedData = cipher.update(data, 'utf8', 'base64');
+    encryptedData += cipher.final('base64');
+    // logger.logVerbose('[#AES#e]','encrypted data=', encryptedData);
+    
+    var encrypted64 = base64url(encryptedData);
+    // logger.logVerbose('[#AES#e]','encrypted64 data=', encrypted64);
+
+    // TO REMOVE!!! SOLO TEST DI VERIFICA 
+    // var d1 = 'RFd1U2hIT29Qczh0dU4zOHJoU2FRVGF6cE5rMnltaG1pMHBRT0pIRHgvMGkxakllSEUwTTNidnJyaVJkLy92cndKdGxpcElKUDFhd3F6SGpjeEQ3MDM1NktGMzIvTU9mWVpORVR1ODN6Zmd2THh4dkUzRUhJMzFLWU53eDBqZXE3SDZudlFTMXRUbjJocjQyT2V6K3FWR1lWSkJWNjUxTVNIMGJMdjFDbXpGVlFJeW5UcDc5VHhsTTNIeE5vOC9iRE8rNEFVQWtLNDlYNktodXA4QTNzK0o3MUNFWFNNZERPVUZZMVFEZS81TT0';
+    // var iv = 'GflWdWVhkGodG5yo';
+    // var dataDecoded = base64url.decode(d1);
+    // logger.logVerbose('[#AES# - reverse]','encryptedDecoded data=', dataDecoded);
+    // var decryptor = crypto.createDecipheriv(cipher_algorithm, password, iv);
+    // var decryptedData = decryptor.update(dataDecoded, 'base64', 'utf8') + decryptor.final('utf8');
+    // logger.logVerbose('[#AES# - reverse]','decrypted data=', decryptedData);
+
+    return encrypted64;
+  },
+
+  createJWT: function(user, timeout1, timeout2) {
+
+          // logger.logVerbose('utilityModule.js:createJWT');
+          // moment.js syntax 
+          // https://momentjs.com/docs/#/manipulating/add/
+          // moment().add(7, 'd');
+          timeout1 = timeout1 || 10;
+          timeout2 = timeout2 || 'm';
+          // logger.logVerbose('TIME >>>> ', timeout1, timeout2);
+          // logger.logVerbose('utilityModule.js:timeout1:', timeout1);
+          // logger.logVerbose('utilityModule.js:timeout2:', timeout2);
+          timeOut = moment().add(timeout1, timeout2).unix();
+          user.sessionTimeout = timeOut;
+          // logger.logVerbose('utilityModule.js:now     :', moment().unix());
+          // logger.logVerbose('utilityModule.js:timeout :', timeOut);
+
+          // logger.logVerbose('TIME >>>> ', moment().unix(), moment().add(timeout1, timeout2).unix());
+
+          var payload = {
+            sub: user,
+            iat: moment().unix(),
+            // timeout di 8 ore
+            exp: timeOut
+          };
+          return jwt.sign(payload, "12CHIAVESUPERSEGRETA12CHIAVESU12");
+    }
 
 }

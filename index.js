@@ -17,16 +17,36 @@ app.use(function(req, res, next){
 })
 
 
-app.get('/getSpidUrl2', function(req, res) {
-    console.log('getSpidUrl');
-    console.log(req.headers);
+app.get('/getGatewayUrl', function(req, res) {
+    console.log('getGatewayUrl');
+    const uuid = require('uuid');
+    var uuidStr = uuid.v4();
+    var sToReturn = 'demo2' + ";" + uuidStr;
+    let iv = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+      // iv = 'FAKEIV1234567890';
+    var dataEncrypted = cV.encryptStringWithAES_64(sToReturn, iv);
     var msg = {};
-    msg.token = 'afòalsdfjkaòsdfkljaòsdfjkaòs' + new Date();
-    msg.id = req.params.formId;
-    msg.url = 'https://aaa.com';
+    msg.token = cV.createJWT('federaToken');
+    msg.id = uuid;
+    msg.url = 'https://autenticazione.comune.rimini.it/gw-authFAKE.php' + '?appId=' + 'demo2' + '&data=' + iv + dataEncrypted;
+    
+        
     res.send(msg);
 });
 
+app.get('/landingFromGateway', function (req, res) {
+  console.log('landingFromGateway');
+  if(req.query.data) {
+    var data2decrypt = (req.query.data).substring(16);
+    var dataIV = (req.query.data).substring(0,16);
+    console.log('...redirect..to...app');
+    // res.send('data recieved! redirecting...');
+    res.redirect("https://angular-formly-ngx-custom-validation.stackblitz.io/json/radio");
+  } else {
+    res.send('no valid data!');
+  }
+});
+        
 app.get('/', (req, res) => {
   res.send(
     `
