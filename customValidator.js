@@ -263,31 +263,19 @@ module.exports = {
 
 
 
-  createJWT: function(user, timeout1, timeout2) {
+  createJWT: function(pL, secret) {
 
-          // logger.logVerbose('utilityModule.js:createJWT');
-          // moment.js syntax 
-          // https://momentjs.com/docs/#/manipulating/add/
-          // moment().add(7, 'd');
-          timeout1 = timeout1 || 10;
-          timeout2 = timeout2 || 'm';
-          // logger.logVerbose('TIME >>>> ', timeout1, timeout2);
-          // logger.logVerbose('utilityModule.js:timeout1:', timeout1);
-          // logger.logVerbose('utilityModule.js:timeout2:', timeout2);
-          timeOut = moment().add(timeout1, timeout2).unix();
-          user.sessionTimeout = timeOut;
-          // logger.logVerbose('utilityModule.js:now     :', moment().unix());
-          // logger.logVerbose('utilityModule.js:timeout :', timeOut);
-
-          // logger.logVerbose('TIME >>>> ', moment().unix(), moment().add(timeout1, timeout2).unix());
-
+          console.log('customValidator.createJWT.pL', pL);
+          console.log('customValidator.createJWT.secret', secret);
           var payload = {
-            sub: user,
-            iat: moment().unix(),
+            issuer : "repl.it",
+            subject: pL,
+            // iat: moment().unix(),
             // timeout di 8 ore
-            exp: timeOut
+            expiresIn: 600 // 600 secondi - 10 minuti
+            // exp: timeOut
           };
-          return jwt.sign(payload, "12CHIAVESUPERSEGRETA12CHIAVESU12");
+          return jwt.sign(payload, secret);
     }
 
 }

@@ -16,7 +16,12 @@ app.use(function(req, res, next){
   next();
 })
 
-
+/**
+ * Ritorna al client l'url per l'autenticazione e salva uuid nell'elenco
+ * delle autorizzazioni per verificare poi se il ritorno dal gateway è
+ * partito da una richiesta
+ * 
+ */
 app.get('/getGatewayUrl', function(req, res) {
     console.log('getGatewayUrl');
     const uuid = require('uuid');
@@ -26,8 +31,7 @@ app.get('/getGatewayUrl', function(req, res) {
       // iv = 'FAKEIV1234567890';
     var dataEncrypted = cV.encryptStringWithAES_64(sToReturn, iv);
     var msg = {};
-    msg.token = cV.createJWT('federaToken');
-    msg.id = uuid;
+    msg.token = cV.createJWT(uuidStr, "secret");
     msg.url = 'https://autenticazione.comune.rimini.it/gw-authFAKE.php' + '?appId=' + 'demo2' + '&data=' + iv + dataEncrypted;
     
         
@@ -89,6 +93,15 @@ app.get('/', (req, res) => {
         <input type="file" name="mypic2" /> <br> 
         <input type="submit" value="submit">  
     </form> 
+
+<h1>Get gateway url</h1>
+        <form action="/getGatewayUrl" 
+       method="GET"> 
+      
+<input type="text1" name="text1" value="text1" /> <br>
+
+        <input type="submit" value="submit">  
+    </form>
 </body> 
   
 </html> 
