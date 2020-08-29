@@ -122,8 +122,17 @@ module.exports = {
 
   },
 
+  // verifica se la risposta è corretta
   checkSvgCapthca: function(uD, sC) {
     console.log('--checkSvgCapthca--');
+    if(uD.svgCaptcha && sC.svgCapthaResponse && 
+    (uD.svgCaptcha === sC.svgCapthaResponse)) {
+      console.log('svgCapthca ok!');     
+
+    } else {
+      console.log('no svgCapthca or not equal');
+      return false;
+    }
 
     // controlla se esiste la risposta
 
@@ -166,8 +175,7 @@ module.exports = {
         sTS.add(eC.tokenTimeoutInMinutes, 'minutes');
         console.log('sTS:', sTS);
         // security context creation time stamp
-        
-
+   
         console.log('isAfter?:', cTS.isAfter(sTS));
 
         if( cTS.isAfter(sTS)) {
@@ -177,12 +185,6 @@ module.exports = {
           return lsC;
         }
 
-
-        // moment().add(7, 'days').add(1, 'months');
-        // moment('2010-10-20').isAfter('2010-10-19'); // true
-
-
-        
       } else {
         console.log('local security context not found!');
         return lsC;

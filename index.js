@@ -16,6 +16,18 @@ app.use(function(req, res, next){
   next();
 })
 
+
+router.get('/getSpidUrl', function(req, res) {
+
+    console.log('getSpidUrl');
+    var msg = {};
+    msg.token = 'afòalsdfjkaòsdfkljaòsdfjkaòs';
+    msg.id = req.params.formId;
+    msg.url = 'https://aaa.com';
+    res.send(msg);
+  
+});
+
 app.get('/', (req, res) => {
   res.send(
     `
