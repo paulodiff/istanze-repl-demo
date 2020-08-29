@@ -237,6 +237,32 @@ module.exports = {
     return encrypted64;
   },
 
+  decryptStringWithAES_64: function(toDecrypt, iv) {
+
+      let cipher_algorithm = 'AES-256-CBC';
+      // logger.logVerbose('[#AES#d]','toDecrypt=', toDecrypt);
+      
+  
+      // get password's md5 hash
+      let password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
+      // logger.logVerbose('[#AES#d]','password=', password); // 098F6BCD4621D373CADE4E832627B4F6
+  
+      // logger.logVerbose('[#AES#d]','data=', toDecrypt);
+      // logger.logVerbose('[#AES#d]','iv=', iv);
+  
+      // decrypt data
+      var dataDecoded = base64url.decode(toDecrypt);
+      // logger.logVerbose('[#AES#d]','dataDecoded=', dataDecoded);
+
+      var decryptor = crypto.createDecipheriv(cipher_algorithm, password, iv);
+      var decryptedData = decryptor.update(dataDecoded, 'base64', 'utf8') + decryptor.final('utf8');
+ 
+      // logger.logVerbose('[#AES#d]','decrypted data=', decryptedData);
+      return decryptedData;
+  },
+
+
+
   createJWT: function(user, timeout1, timeout2) {
 
           // logger.logVerbose('utilityModule.js:createJWT');

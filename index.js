@@ -36,10 +36,29 @@ app.get('/getGatewayUrl', function(req, res) {
 
 app.get('/landingFromGateway', function (req, res) {
   console.log('landingFromGateway');
+  console.log(req.query.data);
   if(req.query.data) {
     var data2decrypt = (req.query.data).substring(16);
     var dataIV = (req.query.data).substring(0,16);
-    console.log('...redirect..to...app');
+    var dataDecrypted = cV.decryptStringWithAES_64(data2decrypt, dataIV);
+    console.log(dataDecrypted); 
+    var dataSplitted  = dataDecrypted.split(";");
+    var userData = {};
+
+    userData.transactionId = dataSplitted[0];
+    userData.nameId = dataSplitted[1];
+    userData.authenticationMethod = dataSplitted[2];
+    userData.authenticatingAuthority = dataSplitted[3];
+    userData.spidCode = dataSplitted[4];
+    userData.policyLevel = dataSplitted[5];
+    userData.trustLevel = dataSplitted[6];
+    userData.userId = dataSplitted[7];
+    userData.codiceFiscale = dataSplitted[8];
+    userData.nome = dataSplitted[9];
+    userData.cognome = dataSplitted[10];
+    userData.dataNascita = dataSplitted[11];
+    userData.luogoNascita = dataSplitted[12];
+    userData.statoNascita = dataSplitted[13];
     // res.send('data recieved! redirecting...');
     res.redirect("https://angular-formly-ngx-custom-validation.stackblitz.io/json/radio");
   } else {
