@@ -11,21 +11,20 @@ const fD = require('./fakeData');
 
 app.use(function(req, res, next){
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   console.log("Request recieved for" + req.path);
   next();
 })
 
 
-router.get('/getSpidUrl', function(req, res) {
-
+app.get('/getSpidUrl2', function(req, res) {
     console.log('getSpidUrl');
+    console.log(req.headers);
     var msg = {};
-    msg.token = 'afòalsdfjkaòsdfkljaòsdfjkaòs';
+    msg.token = 'afòalsdfjkaòsdfkljaòsdfjkaòs' + new Date();
     msg.id = req.params.formId;
     msg.url = 'https://aaa.com';
     res.send(msg);
-  
 });
 
 app.get('/', (req, res) => {
@@ -74,10 +73,6 @@ app.get('/', (req, res) => {
 */
 
 app.post("/microServiceMgr", function(req, res, next) {
-
-
-  
-
   console.log('--headers--');
   console.log(req.headers);
   console.log('--body--');
