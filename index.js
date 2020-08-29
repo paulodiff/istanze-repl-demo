@@ -10,6 +10,8 @@ const cV = require('./customValidator');
 const fD = require('./fakeData');
 const uM = require('./utility');
 
+const password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
+
 
 app.use(function(req, res, next){
   res.header("Access-Control-Allow-Origin", "*");
@@ -31,9 +33,9 @@ app.get('/getGatewayUrl', function(req, res) {
     var sToReturn = 'demo2' + ";" + uuidStr;
     let iv = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
       // iv = 'FAKEIV1234567890';
-    var dataEncrypted = cV.encryptStringWithAES_64(sToReturn, iv);
+    var dataEncrypted = cV.encryptStringWithAES_64(sToReturn, iv, password);
     var msg = {};
-    msg.token = cV.createJWT(uuidStr, "secret");
+    
     uM.saveUuidRequest(uuidStr);
     msg.url = 'https://autenticazione.comune.rimini.it/gw-authFAKE.php' + '?appId=' + 'demo2' + '&data=' + iv + dataEncrypted;
     
@@ -49,7 +51,7 @@ app.get('/landingFromGateway', function (req, res) {
   if(req.query.data) {
     var data2decrypt = (req.query.data).substring(16);
     var dataIV = (req.query.data).substring(0,16);
-    var dataDecrypted = cV.decryptStringWithAES_64(data2decrypt, dataIV);
+    var dataDecrypted = cV.decryptStringWithAES_64(data2decrypt, dataIV, password);
     console.log('dataDecrypted:',dataDecrypted); 
     var dataSplitted  = dataDecrypted.split(";");
     var userData = {};
@@ -71,9 +73,13 @@ app.get('/landingFromGateway', function (req, res) {
     // res.send('data recieved! redirecting...');
 
     console.log('landingFromGateway.check trasactionId', dataSplitted[0]);
-    if(uM.checkIfExistsUuidRequest(dataSplitted[0])) {
-      res.send('ok!');
+    if(uM.checkIfExistsUuiAndRemove(dataSplitted[0])) {
+      console.log('landingFromGateway.saveSession', userData);
       uM.saveSession(dataSplitted[0], userData);
+      var msg = {};
+      msg.token = cV.createJWT(dataSplitted[0], "secret");
+      msg.status = 'session saved!';
+      res.send(msg);
     } else {
       res.send('transactionId not found!');
     }
@@ -108,11 +114,10 @@ app.get('/', (req, res) => {
         <input type="submit" value="submit">  
     </form> 
 
-<h1>Get gateway url</h1>
+<h1>Get gateway url and redirect</h1>
         <form action="/getGatewayUrl" 
        method="GET"> 
       
-<input type="text1" name="text1" value="text1" /> <br>
 
         <input type="submit" value="submit">  
     </form>
@@ -151,7 +156,13 @@ app.get("/me", function(req, res, next) {
   let d = cV.checkJWT(req.query.TOKEN);
   console.log('me.token.decoded', d);
   if(d) {
-    res.send(uM.getSession(d.subject));
+    let info = uM.getSession(d.subject);
+    if(info) {
+       res.send(info);
+    } else {
+      res.send('no session values');
+    }
+    res.send();
   } else {
     res.send('no valid token');
   }

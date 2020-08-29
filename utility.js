@@ -15,14 +15,21 @@ var base64url = require('base64url');
 
 module.exports = {
 
+ /**
+  * Memorizza uuid di transazione per verificare la correttezza del ritorno dal gateway
+ */
   saveUuidRequest : function( v ) {
     fs.writeFileSync("./authenticationIds/" + v, v);
     console.log('utility.saveUuidRequest', v);
   },
 
-  checkIfExistsUuidRequest : function(v) {
+/**
+ * Controlla che un determinato uuid esiste e se esiste lo rimuove non serve più
+ */
+  checkIfExistsUuiAndRemove : function(v) {
     console.log('utility.checkIfExistsUuidRequest', v);
     if (fs.existsSync("./authenticationIds/" + v)) {
+      fs.unlinkSync("./authenticationIds/" + v);
       return true;
     } else {
       return false;
@@ -34,12 +41,23 @@ module.exports = {
   },
 
   getSession : function (uuid) {
+    try {
     let fC = fs.readFileSync("./sessions/" + uuid + '.json');
     return JSON.parse(fC);
+    } catch (err) {
+      console.log('utility.getSession', err);
+      return null;
+    }
   },
 
   removeSession : function (uuid) {
-    fs.unlinkSync("./sessions/" + uuid + '.json');
-    return uuid + ' removed!';
+    try {
+      fs.unlinkSync("./sessions/" + uuid + '.json');
+      return uuid + ' removed!';
+    } catch (err) {
+      console.log('utility.removeSession', err);
+      return uuid + ' removed!';
+
+    }
   }
 }

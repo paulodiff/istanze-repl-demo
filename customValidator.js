@@ -201,13 +201,13 @@ module.exports = {
   },
 
    // Encrypt with AES 64
-  encryptStringWithAES_64: function(toEncrypt, iv) {
+  encryptStringWithAES_64: function(toEncrypt, iv, password) {
 
     let cipher_algorithm = 'AES-256-CBC';
     // logger.logVerbose('[#AES#e]','toEncrypt=', toEncrypt); // 098F6BCD4621D373CADE4E832627B4F6
 
     // get password's md5 hash
-    let password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
+    // let password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
     // logger.logVerbose('[#AES#e]','password=', password); // 098F6BCD4621D373CADE4E832627B4F6
 
     // our data to encrypt
@@ -237,14 +237,14 @@ module.exports = {
     return encrypted64;
   },
 
-  decryptStringWithAES_64: function(toDecrypt, iv) {
+  decryptStringWithAES_64: function(toDecrypt, iv, password) {
 
       let cipher_algorithm = 'AES-256-CBC';
       // logger.logVerbose('[#AES#d]','toDecrypt=', toDecrypt);
       
   
       // get password's md5 hash
-      let password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
+      // let password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
       // logger.logVerbose('[#AES#d]','password=', password); // 098F6BCD4621D373CADE4E832627B4F6
   
       // logger.logVerbose('[#AES#d]','data=', toDecrypt);
