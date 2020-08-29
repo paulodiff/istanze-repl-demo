@@ -126,6 +126,15 @@ app.get('/', (req, res) => {
 
         <input type="submit" value="submit">  
     </form>
+
+    <h1>Logout</h1>
+        <form action="/logout" 
+       method="GET"> 
+      
+<input type="text" name="TOKEN" value="TOKEN" /> <br>
+
+        <input type="submit" value="submit">  
+    </form>
 </body> 
   
 </html> 
@@ -135,20 +144,33 @@ app.get('/', (req, res) => {
 
 
 app.get("/me", function(req, res, next) {
-  console.log('--headers--');
+  console.log('--ME headers--');
   console.log(req.headers);
-  console.log('--query--');
+  console.log('--ME query--');
   console.log(req.query);
   let d = cV.checkJWT(req.query.TOKEN);
   console.log('me.token.decoded', d);
   if(d) {
-    res.send(d);
+    res.send(uM.getSession(d.subject));
   } else {
     res.send('no valid token');
   }
-
-  
 });
+
+app.get("/logout", function(req, res, next) {
+  console.log('--LOGOUT headers--');
+  console.log(req.headers);
+  console.log('--LOGOUT query--');
+  console.log(req.query);
+  let d = cV.checkJWT(req.query.TOKEN);
+  console.log('me.token.decoded', d);
+  if(d) {
+    res.send(uM.removeSession(d.subject));
+  } else {
+    res.send('no valid token');
+  }
+});
+
 
 app.post("/microServiceMgr", function(req, res, next) {
   console.log('--headers--');

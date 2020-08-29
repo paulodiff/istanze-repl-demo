@@ -283,7 +283,7 @@ module.exports = {
         var decoded = jwt.verify(t, "secret");
         return decoded;
       } catch(err) {
-        console.err(err);
+        console.log(err);
         return false;
       }
     }

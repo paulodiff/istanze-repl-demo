@@ -31,6 +31,15 @@ module.exports = {
 
   saveSession : function (uuid, data) {
     fs.writeFileSync("./sessions/" + uuid + '.json', JSON.stringify(data));
-  }
+  },
 
+  getSession : function (uuid) {
+    let fC = fs.readFileSync("./sessions/" + uuid + '.json');
+    return JSON.parse(fC);
+  },
+
+  removeSession : function (uuid) {
+    fs.unlinkSync("./sessions/" + uuid + '.json');
+    return uuid + ' removed!';
+  }
 }
