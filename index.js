@@ -8,6 +8,8 @@ var momentTZ = require('moment-timezone');
 
 const cV = require('./customValidator');
 const fD = require('./fakeData');
+const uM = require('./utility');
+
 
 app.use(function(req, res, next){
   res.header("Access-Control-Allow-Origin", "*");
@@ -32,10 +34,13 @@ app.get('/getGatewayUrl', function(req, res) {
     var dataEncrypted = cV.encryptStringWithAES_64(sToReturn, iv);
     var msg = {};
     msg.token = cV.createJWT(uuidStr, "secret");
+    uM.saveUuidRequest(uuidStr);
     msg.url = 'https://autenticazione.comune.rimini.it/gw-authFAKE.php' + '?appId=' + 'demo2' + '&data=' + iv + dataEncrypted;
     
+    console.log(msg);
         
-    res.send(msg);
+    // res.send(msg);
+    res.redirect(msg.url);
 });
 
 app.get('/landingFromGateway', function (req, res) {
@@ -45,7 +50,7 @@ app.get('/landingFromGateway', function (req, res) {
     var data2decrypt = (req.query.data).substring(16);
     var dataIV = (req.query.data).substring(0,16);
     var dataDecrypted = cV.decryptStringWithAES_64(data2decrypt, dataIV);
-    console.log(dataDecrypted); 
+    console.log('dataDecrypted:',dataDecrypted); 
     var dataSplitted  = dataDecrypted.split(";");
     var userData = {};
 
@@ -64,7 +69,16 @@ app.get('/landingFromGateway', function (req, res) {
     userData.luogoNascita = dataSplitted[12];
     userData.statoNascita = dataSplitted[13];
     // res.send('data recieved! redirecting...');
-    res.redirect("https://angular-formly-ngx-custom-validation.stackblitz.io/json/radio");
+
+    console.log('landingFromGateway.check trasactionId', dataSplitted[0]);
+    if(uM.checkIfExistsUuidRequest(dataSplitted[0])) {
+      res.send('ok!');
+      uM.saveSession(dataSplitted[0], userData);
+    } else {
+      res.send('transactionId not found!');
+    }
+    // res.redirect("https://angular-formly-ngx-custom-validation.stackblitz.io/json/radio");
+    
   } else {
     res.send('no valid data!');
   }
@@ -103,26 +117,38 @@ app.get('/', (req, res) => {
         <input type="submit" value="submit">  
     </form>
 </body> 
+
+<h1>Me</h1>
+        <form action="/me" 
+       method="GET"> 
+      
+<input type="text" name="TOKEN" value="TOKEN" /> <br>
+
+        <input type="submit" value="submit">  
+    </form>
+</body> 
   
 </html> 
 `)
 });
 
-/*
-  nome del servizio (da lista) serve ?
-  azione (da lista)
-  apiKey per accedere ad un determinato servizio (
-    - utente
-    - metodi da poter chiamare ...
-  )
-  dati
 
-  controllo generico su corretta request
-  controllo autenticazione/autorizzazione
-  controllo della richiesta
-  caricamento servizio
 
-*/
+app.get("/me", function(req, res, next) {
+  console.log('--headers--');
+  console.log(req.headers);
+  console.log('--query--');
+  console.log(req.query);
+  let d = cV.checkJWT(req.query.TOKEN);
+  console.log('me.token.decoded', d);
+  if(d) {
+    res.send(d);
+  } else {
+    res.send('no valid token');
+  }
+
+  
+});
 
 app.post("/microServiceMgr", function(req, res, next) {
   console.log('--headers--');

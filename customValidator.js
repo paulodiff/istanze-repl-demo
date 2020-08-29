@@ -276,6 +276,16 @@ module.exports = {
             // exp: timeOut
           };
           return jwt.sign(payload, secret);
+    },
+
+    checkJWT : function(t) {
+      try {
+        var decoded = jwt.verify(t, "secret");
+        return decoded;
+      } catch(err) {
+        console.err(err);
+        return false;
+      }
     }
 
 }
