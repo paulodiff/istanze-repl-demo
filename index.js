@@ -173,25 +173,27 @@ app.get("/me",
     if(info) {
        res.send(info);
     } else {
-      res.send('no session values');
+      res.send({status : 'error', msg: 'no session values'});
     }
     
   } else {
-    res.send('no valid token');
+    res.send({status : 'error', msg: 'no valid token'});
   }
 });
 
-app.get("/logout", function(req, res, next) {
+app.get("/logout", 
+  cV.existToken,
+  function(req, res, next) {
   console.log('--LOGOUT headers--');
   console.log(req.headers);
   console.log('--LOGOUT query--');
   console.log(req.query);
-  let d = cV.checkJWT(req.query.TOKEN);
+  let d = cV.checkJWT(req.token);
   console.log('me.token.decoded', d);
   if(d) {
     res.send(uM.removeSession(d.subject));
   } else {
-    res.send('no valid token');
+    res.send({status : 'error', msg: 'no valid token'});
   }
 });
 
