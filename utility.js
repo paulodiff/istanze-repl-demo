@@ -19,8 +19,11 @@ module.exports = {
   * Memorizza uuid di transazione per verificare la correttezza del ritorno dal gateway
  */
   saveUuidRequest : function( v ) {
-    fs.writeFileSync("./authenticationIds/" + v, v);
-    console.log('utility.saveUuidRequest', v);
+    var data = {};
+    data.ts = this.getLocalTimestamp();
+    data.uuid = v;
+    fs.writeFileSync("./authenticationIds/" + v, JSON.stringify(data));
+    console.log('utility.saveUuidRequest', data);
   },
 
 /**
@@ -59,5 +62,9 @@ module.exports = {
       return uuid + ' removed!';
 
     }
+  },
+
+  getLocalTimestamp : function() {
+    return momentTZ().tz("Europe/Rome").format();
   }
 }

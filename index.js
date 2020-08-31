@@ -9,8 +9,27 @@ var momentTZ = require('moment-timezone');
 const cV = require('./customValidator');
 const fD = require('./fakeData');
 const uM = require('./utility');
+const ENV = require('./config');
 
 const password = "12CHIAVESUPERSEGRETA12CHIAVESU12";
+
+
+// starting logger
+
+var lmWS = require('./logger');
+var logger = new lmWS({
+    logPath : ENV.logWinstonConfig.logPath,
+    logName : ENV.logWinstonConfig.logName,
+    secret : ENV.logWinstonConfig.secret,
+    encryptVerbose : ENV.logWinstonConfig.encryptVerbose,
+    toConsole : ENV.logWinstonConfig.toConsole,
+    to: ENV.logWinstonConfig.logMailOptions.to,
+    from: ENV.logWinstonConfig.logMailOptions.from,
+    subject : ENV.logWinstonConfig.logMailOptions.subject,
+    host: ENV.logWinstonConfig.logMailOptions.host,
+    port: ENV.logWinstonConfig.logMailOptions.port}).getInstance();
+logger.logVerbose('LOG-DEMO',{ "mgs" : "start logger", "success" : true});
+logger.logFile.info('LOG-DEMO', { "mgs" : "start logger", "success" : true});
 
 
 app.use(function(req, res, next){
@@ -41,8 +60,8 @@ app.get('/getGatewayUrl', function(req, res) {
     
     console.log(msg);
         
-    // res.send(msg);
-    res.redirect(msg.url);
+    res.send(msg);
+    // res.redirect(msg.url);
 });
 
 app.get('/landingFromGateway', function (req, res) {
@@ -79,7 +98,11 @@ app.get('/landingFromGateway', function (req, res) {
       var msg = {};
       msg.token = cV.createJWT(dataSplitted[0], "secret");
       msg.status = 'session saved!';
-      res.send(msg);
+      //res.send(msg);
+      var url = 
+      "https://angular-formly-ngx-custom-validation.stackblitz.io/login/" + msg.token;
+      console.log('landingFromGateway.redirect', url);
+      res.redirect(url);
     } else {
       res.send('transactionId not found!');
     }
@@ -93,67 +116,57 @@ app.get('/landingFromGateway', function (req, res) {
 app.get('/', (req, res) => {
   res.send(
     `
- <!DOCTYPE html> 
+<!DOCTYPE html> 
 <html> 
-  
 <head> 
     <title>FILE UPLOAD DEMO</title> 
 </head> 
   
 <body> 
-    <h1>Single File Upload Demo</h1> 
-   
-    <form action="/upload" 
+<h1>Single File Upload Demo</h1> 
+<form action="/upload" 
       enctype="multipart/form-data" method="POST"> 
       
 <input type="text1" name="text1" value="text1" /> <br>
 <input type="text2" name="text2" value="text2" /> <br>
-
-        <input type="file" name="mypic1" /> <br> 
-        <input type="file" name="mypic2" /> <br> 
-        <input type="submit" value="submit">  
-    </form> 
+<input type="file" name="mypic1" /> <br> 
+<input type="file" name="mypic2" /> <br> 
+<input type="submit" value="submit">  
+</form> 
 
 <h1>Get gateway url and redirect</h1>
-        <form action="/getGatewayUrl" 
-       method="GET"> 
-      
-
-        <input type="submit" value="submit">  
-    </form>
-</body> 
+<form action="/getGatewayUrl"  method="GET"> 
+<input type="submit" value="submit">  
+</form>
 
 <h1>Me</h1>
-        <form action="/me" 
-       method="GET"> 
-      
+<form action="/me"   method="GET"> 
 <input type="text" name="TOKEN" value="TOKEN" /> <br>
+<input type="submit" value="submit">  
+</form>
 
-        <input type="submit" value="submit">  
-    </form>
-
-    <h1>Logout</h1>
-        <form action="/logout" 
-       method="GET"> 
-      
+<h1>Logout</h1>
+<form action="/logout"  method="GET"> 
 <input type="text" name="TOKEN" value="TOKEN" /> <br>
+<input type="submit" value="submit">  
+</form>
 
-        <input type="submit" value="submit">  
-    </form>
 </body> 
-  
 </html> 
 `)
 });
 
 
 
-app.get("/me", function(req, res, next) {
+app.get("/me", 
+  cV.existToken,
+  function(req, res, next) {
   console.log('--ME headers--');
   console.log(req.headers);
   console.log('--ME query--');
   console.log(req.query);
-  let d = cV.checkJWT(req.query.TOKEN);
+  console.log(req.token);
+  let d = cV.checkJWT(req.token);
   console.log('me.token.decoded', d);
   if(d) {
     let info = uM.getSession(d.subject);
@@ -162,7 +175,7 @@ app.get("/me", function(req, res, next) {
     } else {
       res.send('no session values');
     }
-    res.send();
+    
   } else {
     res.send('no valid token');
   }
@@ -182,16 +195,6 @@ app.get("/logout", function(req, res, next) {
   }
 });
 
-
-app.post("/microServiceMgr", function(req, res, next) {
-  console.log('--headers--');
-  console.log(req.headers);
-  console.log('--body--');
-  console.log(req.body);
-  console.log('--files--');
-  console.log(req.files);
-  res.send({"status" : "success", "msg": "Success!"});
-});
 
 app.get("/info", function(req, res, next) {
   console.log('--headers--');

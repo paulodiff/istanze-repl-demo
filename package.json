@@ -18,6 +18,9 @@
     "moment-timezone": "^0.5.31",
     "multer": "^1.4.2",
     "sha.js": "^2.4.11",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.0",
+    "winston-mail": "^2.0.0"
   }
 }

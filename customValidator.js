@@ -279,6 +279,7 @@ module.exports = {
     },
 
     checkJWT : function(t) {
+      console.log('customValidator.checkJWT', t);
       try {
         var decoded = jwt.verify(t, "secret");
         return decoded;
@@ -286,6 +287,29 @@ module.exports = {
         console.log(err);
         return false;
       }
+    },
+
+  existToken : function(req, res, next) {
+    
+    const bearerHeader = req.headers['authorization'];
+    console.log('customValidator.existToken', bearerHeader);
+
+    if (bearerHeader) {
+      const bearer = bearerHeader.split(' ');
+      const bearerToken = bearer[1];
+      req.token = bearerToken;
+      if(module.exports.checkJWT(req.token)) {
+        console.log('customValidator.existToken.checkToken.OK');
+        next();
+      } else {
+          console.log('customValidator.existToken.checkToken.KO');
+        res.sendStatus(403);
+      }
+      
+    } else {
+      console.log('customValidator.existToken', 'NOT EXISTS');
+      res.sendStatus(403);
     }
+  }
 
 }
